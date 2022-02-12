@@ -33,7 +33,25 @@ print(y_train)
 def predict_knn(k=1, tau=1):
     """Returns predictions for the values in x_test, using KNN predictor with the specified k."""
     # TODO: your code here
-    return np.zeros(len(x_test))
+    # pseudocode: use kernel to find k-closest to x^* and append to list
+    # 
+
+    
+    y_pred = []
+    for x in x_test:
+        dist = []
+        for i in range(len(data)):
+            dist.append(math.pow(math.e, -(data[i][0]-x)**2 / tau))
+        
+        dist = np.array(dist)
+        dist_sort = np.flip(np.argsort(dist))
+
+        sum = 0
+        for i in range(k):
+            sum += data[dist_sort[i]][1]
+        
+        y_pred.append(sum / k)
+    return y_pred
 
 
 def plot_knn_preds(k):

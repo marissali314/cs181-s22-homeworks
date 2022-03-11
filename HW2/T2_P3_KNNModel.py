@@ -12,9 +12,10 @@ class KNNModel:
         self.y = None
         self.K = k
 
-    # Just to show how to make 'private' methods
-    def __dummyPrivateMethod(self, input):
-        return None
+    # star_1, star_2 correspond to the different star rows
+    def __distance(self, star_1, star_2):
+        dist = ((star_1[0]-star_2[0])/3)**2 + (star_1[1]-star_2[1])**2
+        return dist
 
     # TODO: Implement this method!
     def predict(self, X_pred):
@@ -23,8 +24,15 @@ class KNNModel:
         # (currently meaningless) visualization.
         preds = []
         for x in X_pred:
-            z = np.cos(x ** 2).sum()
-            preds.append(1 + np.sign(z) * (np.abs(z) > 0.3))
+            dist = []
+            for idx, ele in enumerate(self.X):
+                dist.append((self.__distance(x, ele),self.y[idx]))
+            
+            dist.sort( key=lambda tup: tup[0])
+            classes = [x[1] for x in dist]
+            classes = classes[0:self.K]
+            
+            preds.append(max(set(classes), key=classes.count))
         return np.array(preds)
 
     # In KNN, "fitting" can be as simple as storing the data, so this has been written for you

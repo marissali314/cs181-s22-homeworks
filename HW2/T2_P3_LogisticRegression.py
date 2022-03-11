@@ -1,4 +1,8 @@
 import numpy as np
+from sympy import C
+import matplotlib.pyplot as plt
+import matplotlib.colors as c
+import pandas as pd
 
 
 
@@ -8,30 +12,53 @@ import numpy as np
 # free to change any of the class attributes, as long as you do not change any
 # of the given function headers (they must take and return the same arguments).
 
+
 class LogisticRegression:
     def __init__(self, eta, lam):
         self.eta = eta
         self.lam = lam
+        self.W = np.ones((3,2), dtype=float)
 
-    # Just to show how to make 'private' methods
-    def __dummyPrivateMethod(self, input):
-        return None
 
-    # TODO: Implement this method!
-    def fit(self, X, y):
+    def softmax(self):
+        v = np.dot(self.X, self.W)
+        return (np.exp(v).T/np.exp(v).sum(axis=1)).T
+    
+    def one_hot(self):
+        for i in range(np.zeros((self.y.shape[0],3)).shape[0]):
+            np.zeros((self.y.shape[0],3))[i,self.y[i]] = 1
+        self.t = np.zeros((self.y.shape[0],3))
+        return
+
+    def grad(self):
+        for i in range(200000):
+            gradient = np.dot((self.softmax() - self.t), self.X.T) + 2*self.lam * np.vstack((np.zeros(3), self.W.T[1:])).T
+            self.W = self.W - self.eta * gradient
         return
 
     # TODO: Implement this method!
+    def fit(self, X, y):
+        self.X = X
+        self.X = np.c_[np.ones(self.X.shape[0]), self.X]
+        self.y = y
+        self.one_hot()
+        self.grad()
+        return
+        
+
+    # TODO: Implement this method!
     def predict(self, X_pred):
-        # The code in this method should be removed and replaced! We included it
-        # just so that the distribution code is runnable and produces a
-        # (currently meaningless) visualization.
-        preds = []
-        for x in X_pred:
-            z = np.cos(x ** 2).sum()
-            preds.append(1 + np.sign(z) * (np.abs(z) > 0.3))
-        return np.array(preds)
+        self.X = X_pred
+        pred = self.softmax()
+        label = pred.argmax(axis=1)
+        return label
 
     # TODO: Implement this method!
     def visualize_loss(self, output_file, show_charts=False):
-        pass
+        plt.figure()
+        plt.title('Logistic Regression $\mu=$' + str(self.eta) + ' and $\lambda=$' + str(self.lam))
+        plt.plot(range(self.runs), self.loss)
+        plt.savefig(output_file + '.png')
+        if show_charts:
+            plt.show()
+
